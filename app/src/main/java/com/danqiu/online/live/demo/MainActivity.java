@@ -14,6 +14,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         String sdkver = TXLiveBase.getSDKVersionStr();
-        Log.e("test", "--------liteav sdk version is : " + sdkver);
+        Log.e("test", "------2--liteav sdk version is : " + sdkver);
     }
 }

@@ -4,64 +4,55 @@ import android.Manifest;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
+import com.danqiu.online.live.demo.ui.LivePullActivity;
+import com.danqiu.online.live.demo.ui.LivePushActivity;
+import com.danqiu.online.live.demo.ui.TxPlayerActivity;
+import com.danqiu.online.live.demo.utils.IntentUtil;
 import com.danqiu.online.live.demo.utils.ToastUtil;
-import com.tencent.rtmp.TXLivePushConfig;
-import com.tencent.rtmp.TXLivePusher;
-import com.tencent.rtmp.ui.TXCloudVideoView;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
+/**
+ * 腾讯 直播、点播sdk测试
+ */
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+    @BindView(R.id.bt_push)
+    Button btPush;
+    @BindView(R.id.bt_pull)
+    Button btPull;
+    @BindView(R.id.bt_player)
+    Button btPlayer;
 
-    @BindView(R.id.pusher_tx_cloud_view)
-    TXCloudVideoView pusherTxCloudView;
-    TXLivePusher mLivePusher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        //String sdkver = TXLiveBase.getSDKVersionStr();
         requestPermission();
-        initTXLivePusher();
-
     }
 
-    /**
-     * 初始化 TXLivePusher 组件
-     */
-    private void initTXLivePusher() {
-        TXLivePushConfig mLivePushConfig  = new TXLivePushConfig();
-        mLivePusher = new TXLivePusher(this);
-       // 一般情况下不需要修改 config 的默认配置// 一般情况下不需要
-        mLivePusher.setConfig(mLivePushConfig);
-
-        //启动本地摄像头预览
-        TXCloudVideoView mPusherView = (TXCloudVideoView) findViewById(R.id.pusher_tx_cloud_view);
-        mLivePusher.startCameraPreview(mPusherView);
-
-        //启动推流
-        String rtmpURL = "rtmp://test.com/live/xxxxxx"; //此处填写您的 rtmp 推流地址
-        int ret = mLivePusher.startPusher(rtmpURL.trim());
-        if (ret == -5) {
-            Log.e("test", "-----------startRTMPPush: license 校验失败");
+    @OnClick({R.id.bt_push, R.id.bt_pull, R.id.bt_player})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.bt_push:
+                IntentUtil.IntenToActivity(this,LivePushActivity.class);
+                break;
+            case R.id.bt_pull:
+                IntentUtil.IntenToActivity(this, LivePullActivity.class);
+                break;
+            case R.id.bt_player:
+                IntentUtil.IntenToActivity(this, TxPlayerActivity.class);
+                break;
         }
     }
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mLivePusher.stopPusher();
-        mLivePusher.stopCameraPreview(true); //如果已经启动了摄像头预览，请在结束推流时将其关闭
-    }
-
 
     private void requestPermission() {
         String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -69,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 Manifest.permission.CAMERA};
         if (EasyPermissions.hasPermissions(this, perms)) {
             // Already have permission, do the thing
-             Log.e("test", "--------------------已有权限，版本检测");
+            Log.e("test", "--------------------已有权限，版本检测");
             //checkUpdate();
         } else {
             // Do not have permissions, request them now
@@ -81,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         switch (requestCode) {
             case 1:
-               // checkUpdate();
+                // checkUpdate();
                 break;
         }
     }
@@ -96,5 +87,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+
 
 }
